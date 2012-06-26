@@ -1,4 +1,0 @@
-6/20/2012 v0.3.0
-- fixed a crash when trying to load a profiles without config file present
-- added a message after longer running operations are completed to notify the user
-- added support for loading multiple profiles
