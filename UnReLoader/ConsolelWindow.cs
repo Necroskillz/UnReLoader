@@ -19,7 +19,7 @@ namespace NecroNet.UnReLoader
     /// This class derives from the ToolWindowPane class provided from the MPF in order to use its 
     /// implementation of the IVsUIElementPane interface.
     /// </summary>
-    [Guid("c7fdfc8a-1091-4ea6-8f4e-5a89a20c3075")]
+    [Guid(GuidList.guidToolWindowPersistanceString)]
     public class ConsolelWindow : ToolWindowPane
     {
         /// <summary>

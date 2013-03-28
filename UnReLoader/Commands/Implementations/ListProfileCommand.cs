@@ -15,7 +15,11 @@ namespace NecroNet.UnReLoader.Commands
 
 			if(Parameters.Count == 0)
 			{
-				ProfileManager.GetProfiles(Out).ForEach(DumpProfileInfo);
+				var profiles = ProfileManager.GetProfiles(Out);
+				if (profiles != null)
+				{
+					profiles.ForEach(DumpProfileInfo);
+				}
 			}
 			else
 			{

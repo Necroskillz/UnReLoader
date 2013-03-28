@@ -1,13 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<!--
-    VS SDK Notes: This resx file contains the resources that will be consumed directly by your package.
-    For example, if you chose to create a tool window, there is a resource with ID 'CanNotCreateWindow'. This
-    is used in VsPkg.cs to determine the string to show the user if there is an error when attempting to create
-    the tool window.
-
-    Resources that are accessed directly from your package *by Visual Studio* are stored in the VSPackage.resx 
-    file.
--->
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -132,19 +123,37 @@
   <data name="ToolWindowTitle" xml:space="preserve">
     <value>UnReLoader Console</value>
   </data>
-	<data name="ErrorMessageNoSolutionLoaded">
-		<value xml:space="preserve">No solution is loaded.</value>
-	</data>
-	<data name="ErrorMessageProjectWasNotFound">
-		<value xml:space="preserve">Project {0} was not found.</value>
-	</data>
-	<data name="MessageUnloadingProject">
-		<value xml:space="preserve">Unloading {0}</value>
-	</data>
-	<data name="MessageReloadingProject">
-		<value xml:space="preserve">Reloading {0}</value>
-	</data>
-	<data name="MessageSettingProjectAsStartup">
-		<value xml:space="preserve">Setting {0} as startup</value>
-	</data>
+  <data name="ErrorMessageNoSolutionLoaded" xml:space="preserve">
+    <value>ERROR: No solution is loaded.</value>
+  </data>
+  <data name="ErrorMessageProjectWasNotFound" xml:space="preserve">
+    <value>ERROR: Project {0} was not found.</value>
+  </data>
+  <data name="MessageUnloadingProject" xml:space="preserve">
+    <value>Unloading {0}</value>
+  </data>
+  <data name="MessageReloadingProject" xml:space="preserve">
+    <value>Reloading {0}</value>
+  </data>
+  <data name="MessageSettingProjectAsStartup" xml:space="preserve">
+    <value>Setting {0} as startup</value>
+  </data>
+  <data name="ErrorMessageProjectWasNotFoundInProfile" xml:space="preserve">
+    <value>ERROR: Project {0} was not found in profile {1}.</value>
+  </data>
+	<data name="ErrorMessageProfileDoesntExist" xml:space="preserve">
+    <value>ERROR: Profile with that name doesn't exists.</value>
+  </data>
+	<data name="ErrorMessageProjectAlreadyInProfile" xml:space="preserve">
+    <value>ERROR: Project {0} is already associated with profile {1}.</value>
+  </data>
+	<data name="ErrorMessageProfileAlreadyExists" xml:space="preserve">
+    <value>ERROR: Profile with that name already exists.</value>
+  </data>
+	<data name="ErrorMessageInvalidConfigFile" xml:space="preserve">
+    <value>ERROR: Invalid configuration file ({0}), couldn't load profiles.</value>
+  </data>
+	<data name="ErrorMessageDuplicateProject" xml:space="preserve">
+    <value>WARNING: Duplicate project: {0}</value>
+  </data>
 </root>

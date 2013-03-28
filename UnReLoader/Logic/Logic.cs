@@ -25,28 +25,28 @@ namespace NecroNet.UnReLoader
 		public static void ReactivateConsole()
 		{
 			var dte = AppData.Current.DTE;
-			var console = dte.Windows.Item("{C7FDFC8A-1091-4EA6-8F4E-5A89A20C3075}");
+			var console = dte.Windows.Item(GuidList.guidConsoleWindow);
 
 			console.Activate();
 		}
 
 		public static void UnloadOrReloadProjects(UnReLoad unReLoad, IEnumerable<string> projects, Action<string> cout)
 		{
-			var hash = new HashSet<string>(projects.Select(p => p.ToLowerInvariant()));
+			var hash = HashHelper.MakeHashWithOriginal(projects, cout);
 
 			var parameters = CreateParams(cout);
 
 			ExecuteOnProjectsInSolution(project =>
 				{
-					var lowerProjectName = project.Name.ToLowerInvariant();
-					if (hash.Contains(lowerProjectName))
+					var upperProjectName = project.Name.ToUpperInvariant();
+					if (hash.ContainsKey(upperProjectName))
 					{
 						UnloadOrReloadProject(project, parameters, unReLoad);
-						hash.Remove(lowerProjectName);
+						hash.Remove(upperProjectName);
 					}
 				});
 
-			foreach (var project in hash.OrderBy(p => p))
+			foreach (var project in hash.Values.OrderBy(p => p))
 			{
 				cout(string.Format(Resources.ErrorMessageProjectWasNotFound, project));
 			}
@@ -102,29 +102,29 @@ namespace NecroNet.UnReLoader
 
 		public static void LoadProjects(IEnumerable<string> projects, string startupProject, Action<string> cout)
 		{
-			var hash = new HashSet<string>(projects.Select(p => p.ToLowerInvariant()));
+			var hash = HashHelper.MakeHashWithOriginal(projects, cout);
 
 			var parameters = CreateParams(cout);
-			var lowerStartUpProjectName = string.IsNullOrEmpty(startupProject) ? null : startupProject.ToLowerInvariant();
+			var upperStartUpProjectName = string.IsNullOrEmpty(startupProject) ? null : startupProject.ToUpperInvariant();
 
 			ExecuteOnProjectsInSolution(project =>
 				{
-					var lowerProjectName = project.Name.ToLowerInvariant();
+					var upperProjectName = project.Name.ToUpperInvariant();
 					UnReLoad action;
-					if (hash.Contains(lowerProjectName))
+					if (hash.ContainsKey(upperProjectName))
 					{
 						action = UnReLoad.Reload;
-						hash.Remove(lowerProjectName);
+						hash.Remove(upperProjectName);
 					}
 					else
 					{
 						action = UnReLoad.Unload;
 					}
 
-					UnloadOrReloadProject(project, parameters, action, lowerProjectName == lowerStartUpProjectName);
+					UnloadOrReloadProject(project, parameters, action, upperProjectName == upperStartUpProjectName);
 				});
 
-			foreach (var project in hash.OrderBy(p => p))
+			foreach (var project in hash.Values.OrderBy(p => p))
 			{
 				cout(string.Format(Resources.ErrorMessageProjectWasNotFound, project));
 			}

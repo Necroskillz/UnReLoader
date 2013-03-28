@@ -3,7 +3,7 @@
 	<Identifier Id="5efeb50f-fe6c-40e8-86ca-d1dabc476b20">
 		<Name>UnReLoader</Name>
 		<Author>NecroNet</Author>
-		<Version>0.3.2</Version>
+		<Version>0.3.3</Version>
 		<Description xml:space="preserve">Visual Studio 2010 add-in for managing reloading and unloading projects in a solution.</Description>
 		<Locale>1033</Locale>
 		<Icon>unreloader_icon.ico</Icon>

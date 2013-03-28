@@ -28,7 +28,10 @@ namespace NecroNet.UnReLoader.Commands
 			else
 			{
 				var profileParams = Parameters.Select(p => p.ToLowerInvariant());
-				var profiles = ProfileManager.GetProfiles(Out).Where(p => profileParams.Contains(p.Name.ToLowerInvariant())).ToList();
+				var profiles = ProfileManager.GetProfiles(Out);
+				if(profiles == null) return;
+				
+				profiles = profiles.Where(p => profileParams.Contains(p.Name.ToLowerInvariant())).ToList();
 				if(!profiles.Any()) return;
 			
 				startUpProject = profiles.First().StartUpProject;

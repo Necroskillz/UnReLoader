@@ -137,6 +137,7 @@
     </Compile>
     <Compile Include="ConsolelWindow.cs" />
     <Compile Include="Guids.cs" />
+    <Compile Include="Logic\HashHelper.cs" />
     <Compile Include="Logic\Logic.cs" />
     <Compile Include="Logic\ProfileManager.cs" />
     <Compile Include="Logic\Profile.cs" />

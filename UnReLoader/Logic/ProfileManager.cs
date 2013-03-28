@@ -58,7 +58,7 @@ namespace NecroNet.UnReLoader
 			}
 			catch (Exception)
 			{
-				cout(string.Format("Invalid configuration file ({0}), couldn't load profiles.", configFilePath));
+				cout(string.Format(Resources.ErrorMessageInvalidConfigFile, configFilePath));
 			}
 
 			return null;
@@ -71,129 +71,159 @@ namespace NecroNet.UnReLoader
 			var configFilePath = Path.Combine(folder, "unreloader.xml");
 			return configFilePath;
 		}
-
-		public static void CreateProfile(string name, IEnumerable<string> projects, string startUpProject, Action<string> cout)
+		
+		private static T WithProfiles<T>(Action<string> cout, bool save, Func<List<Profile>, T> action)
+			where T : class
 		{
 			var profiles = LoadProfiles(cout);
 
-			if(profiles == null)
+			if (profiles == null)
 			{
-				return;
+				return null;
 			}
 
-			if (profiles.Any(p => string.Equals(p.Name, name, StringComparison.InvariantCultureIgnoreCase)))
-			{
-				cout("Profile with that name already exists.");
-				return;
-			}
+			var ret = action(profiles);
 
-			profiles.Add(new Profile(name, projects.Distinct().ToList(), startUpProject));
+			if(save) SaveProfiles(profiles);
 
-			SaveProfiles(profiles);
+			return ret;
+		}
+
+		private static void WithProfiles(Action<string> cout, Action<List<Profile>> action)
+		{
+			WithProfiles(cout, true, p =>
+				{
+					action(p);
+					return (object) null;
+				});
+		}
+
+		private static T WithProfile<T>(string name, Action<string> cout, bool save, Func<Profile, T> action)
+			where T : class
+		{
+			return WithProfiles(cout, save, profiles =>
+				{
+					var profile = profiles.FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
+
+					if (profile == null)
+					{
+						cout(Resources.ErrorMessageProfileDoesntExist);
+						return null;
+					}
+
+					return action(profile);
+				});
+		}
+
+		private static void WithProfile(string name, Action<string> cout, Action<Profile> action)
+		{
+			WithProfile(name, cout, true, p =>
+				{
+					action(p);
+					return (object) null;
+				});
+		}
+
+		public static void CreateProfile(string name, IEnumerable<string> projects, string startUpProject, Action<string> cout)
+		{
+			WithProfiles(cout, profiles =>
+				{
+					if (profiles.Any(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase)))
+					{
+						cout(Resources.ErrorMessageProfileAlreadyExists);
+						return;
+					}
+
+					profiles.Add(new Profile(name, HashHelper.MakeHashWithOriginal(projects, cout).Values.ToList(), startUpProject));
+				});
 		}
 
 		public static void DeleteProfile(string name, Action<string> cout)
 		{
-			var profiles = LoadProfiles(cout);
+			WithProfiles(cout, profiles =>
+				{
+					var profile = profiles.FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
+					if (profile == null)
+					{
+						cout(Resources.ErrorMessageProfileDoesntExist);
+						return;
+					}
 
-			if (profiles == null)
-			{
-				return;
-			}
-
-			if (profiles.All(p => !string.Equals(p.Name, name, StringComparison.InvariantCultureIgnoreCase)))
-			{
-				cout("Profile with that name doesn't exists.");
-				return;
-			}
-
-			profiles.RemoveAll(p => string.Equals(p.Name, name, StringComparison.InvariantCultureIgnoreCase));
-
-			SaveProfiles(profiles);
+					profiles.Remove(profile);
+				});
 		}
 
 		public static void AddProjectsToProfile(string name, IEnumerable<string> projects, Action<string> cout)
 		{
-			var profiles = LoadProfiles(cout);
+			WithProfile(name, cout, profile =>
+				{
+					var profileProjects = HashHelper.MakeHash(profile.Projects, cout);
 
-			if(profiles == null)
-			{
-				return;
-			}
-
-			var profile = profiles.FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.InvariantCultureIgnoreCase));
-
-			if(profile == null)
-			{
-				cout("Profile with that name doesn't exists.");
-				return;
-			}
-
-			profile.Projects = profile.Projects.Union(projects).ToList();
-
-			SaveProfiles(profiles);
+					foreach (var project in projects)
+					{
+						var upperProjectName = project.ToUpperInvariant();
+						if (profileProjects.Contains(upperProjectName))
+						{
+							cout(string.Format(Resources.ErrorMessageProjectAlreadyInProfile, project, profile.Name));
+						}
+						else
+						{
+							profile.Projects.Add(project);
+						}
+					}
+				});
 		}
 
 		public static void RemoveProjectsFromProfile(string name, IEnumerable<string> projects, Action<string> cout)
 		{
-			var profiles = LoadProfiles(cout);
+			WithProfile(name, cout, profile =>
+				{
+					var remove = HashHelper.MakeHashWithOriginal(projects, cout);
+					var updatedProjects = new List<string>();
 
-			if (profiles == null)
-			{
-				return;
-			}
+					foreach (var project in profile.Projects)
+					{
+						var upperProjectName = project.ToUpperInvariant();
+						if (remove.ContainsKey(upperProjectName))
+						{
+							remove.Remove(upperProjectName);
+						}
+						else
+						{
+							updatedProjects.Add(project);
+						}
+					}
 
-			var profile = profiles.FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.InvariantCultureIgnoreCase));
+					profile.Projects = updatedProjects;
 
-			if (profile == null)
-			{
-				cout("Profile with that name doesn't exists.");
-				return;
-			}
-
-			profile.Projects = profile.Projects.Except(projects).ToList();
-
-			SaveProfiles(profiles);
+					foreach (var project in remove.Values)
+					{
+						cout(string.Format(Resources.ErrorMessageProjectWasNotFoundInProfile, project, profile.Name));
+					}
+				});
 		}
-
+		
 		public static void SetStartupProjectForProfile(string name, string startUpProject, Action<string> cout)
 		{
-			var profiles = LoadProfiles(cout);
+			WithProfile(name, cout, profile =>
+				{
+					if (!profile.Projects.Any(p => string.Equals(p, startUpProject, StringComparison.OrdinalIgnoreCase)))
+					{
+						cout(string.Format(Resources.ErrorMessageProjectWasNotFoundInProfile, startUpProject, profile.Name));
+					}
 
-			if (profiles == null)
-			{
-				return;
-			}
-
-			var profile = profiles.FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.InvariantCultureIgnoreCase));
-
-			if (profile == null)
-			{
-				cout("Profile with that name doesn't exists.");
-				return;
-			}
-
-			profile.StartUpProject = startUpProject;
-
-			SaveProfiles(profiles);
+					profile.StartUpProject = startUpProject;
+				});
 		}
 
 		public static List<Profile> GetProfiles(Action<string> cout)
 		{
-			return LoadProfiles(cout);
+			return WithProfiles(cout, false, p => p);
 		}
 
 		public static Profile GetProfile(string name, Action<string> cout)
 		{
-			var profiles = LoadProfiles(cout);
-			var profile = profiles.FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.InvariantCultureIgnoreCase));
-
-			if (profile == null)
-			{
-				cout("Profile with that name doesn't exists.");
-			}
-
-			return profile;
+			return WithProfile(name, cout, false, p => p);
 		}
 	}
 }
