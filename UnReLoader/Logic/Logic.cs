@@ -7,20 +7,6 @@ using EnvDTE80;
 
 namespace NecroNet.UnReLoader
 {
-	public class UnReLoadParams
-	{
-		public UnReLoadParams(string solutionName, UIHierarchy solutionExplorer, Action<string> @out)
-		{
-			SolutionName = solutionName;
-			SolutionHierarchy = solutionExplorer;
-			Out = @out;
-		}
-
-		public string SolutionName { get; set; }
-		public UIHierarchy SolutionHierarchy { get; set; }
-		public Action<string> Out { get; set; }
-	}
-
 	public static class Logic
 	{
 		private static UnReLoadParams CreateParams(Action<string> cout)
@@ -34,6 +20,14 @@ namespace NecroNet.UnReLoader
 			var solutionHierarchy = (UIHierarchy)solutionExplorer.Object;
 
 			return new UnReLoadParams(solutionName, solutionHierarchy, cout);
+		}
+
+		public static void ReactivateConsole()
+		{
+			var dte = AppData.Current.DTE;
+			var console = dte.Windows.Item("{C7FDFC8A-1091-4EA6-8F4E-5A89A20C3075}");
+
+			console.Activate();
 		}
 
 		public static void UnloadOrReloadProjects(UnReLoad unReLoad, IEnumerable<string> projects, Action<string> cout)
@@ -116,8 +110,24 @@ namespace NecroNet.UnReLoader
 			ExecuteOnProjectsInSolution(project =>
 				{
 					var lowerProjectName = project.Name.ToLowerInvariant();
-					UnloadOrReloadProject(project, parameters, hash.Contains(lowerProjectName) ? UnReLoad.Reload : UnReLoad.Unload, lowerProjectName == lowerStartUpProjectName);
+					UnReLoad action;
+					if (hash.Contains(lowerProjectName))
+					{
+						action = UnReLoad.Reload;
+						hash.Remove(lowerProjectName);
+					}
+					else
+					{
+						action = UnReLoad.Unload;
+					}
+
+					UnloadOrReloadProject(project, parameters, action, lowerProjectName == lowerStartUpProjectName);
 				});
+
+			foreach (var project in hash.OrderBy(p => p))
+			{
+				cout(string.Format(Resources.ErrorMessageProjectWasNotFound, project));
+			}
 		}
 
 		public static Snapshot GetSnapshot()

@@ -6,9 +6,35 @@ using System.Threading.Tasks;
 
 namespace NecroNet.UnReLoader.Commands
 {
+	public class CommandInfo
+	{
+		public Type Type { get; set; }
+		public CommandMetadataAttribute Metadata { get; set; }
+	}
+
 	public static class CommandExecutor
 	{
-		public static void Execute(string command, Action<string> cout)
+		private static readonly Dictionary<string, CommandInfo> CommandCache = new Dictionary<string, CommandInfo>();
+
+		static CommandExecutor()
+		{
+			var info = (from type in Assembly.GetExecutingAssembly().GetTypes()
+			            let attribute = type.GetCustomAttributes(typeof (CommandMetadataAttribute), false).FirstOrDefault() as CommandMetadataAttribute
+			            where attribute != null
+			            select new CommandInfo
+				                   {
+					                   Type = type,
+					                   Metadata = attribute
+				                   }).ToList();
+
+			foreach (var commandInfo in info)
+			{
+				CommandCache.Add(commandInfo.Metadata.Name, commandInfo);
+				CommandCache.Add(commandInfo.Metadata.ShortHand, commandInfo);
+			}
+		}
+
+		public static void Execute(string command, Action<string> cout, Action afterExecute)
 		{
 			var parameters = command.Split(' ').ToList();
 
@@ -20,26 +46,27 @@ namespace NecroNet.UnReLoader.Commands
 			
 			var commandName = parameters[0].ToLowerInvariant();
 			parameters.RemoveAt(0);
-
-			var commandInfo = (from type in Assembly.GetExecutingAssembly().GetTypes()
-			                   let attribute = type.GetCustomAttributes(typeof (CommandInfoAttribute), false).FirstOrDefault() as CommandInfoAttribute
-			                   where attribute != null && attribute.Name == commandName
-			                   select new { Type = type, Info = attribute }).FirstOrDefault();
 			
-			if(commandInfo == null)
+			if(!CommandCache.ContainsKey(commandName))
 			{
 				cout(string.Format("Unknown command {0}.", commandName));
 				return;
 			}
 
+			var commandInfo = CommandCache[commandName];
 			var instance = (CommandBase)Activator.CreateInstance(commandInfo.Type);
 
 			instance.SetParams(parameters, cout);
 			Task.Factory.StartNew(instance.ExecuteCore).ContinueWith(t =>
 				{
-					if(commandInfo.Info.WriteDoneMessage)
+					if(commandInfo.Metadata.WriteDoneMessage)
 					{
 						cout("Operation completed");
+					}
+
+					if (afterExecute != null)
+					{
+						afterExecute();
 					}
 				});
 		}

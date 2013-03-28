@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace NecroNet.UnReLoader.Commands
 {
-	[CommandInfo("unload", WriteDoneMessage = true)]
+	[CommandMetadata("unload", ShortHand = "u", WriteDoneMessage = true)]
 	public class UnloadProjectsCommand : CommandBase
 	{
 		public override void Execute()

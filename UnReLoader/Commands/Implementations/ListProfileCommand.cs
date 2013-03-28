@@ -4,7 +4,7 @@ using System;
 
 namespace NecroNet.UnReLoader.Commands
 {
-	[CommandInfo("plist")]
+	[CommandMetadata("plist", ShortHand = "pls")]
 	public class ListProfileCommand : CommandBase
 	{
 		public override void Execute()
@@ -32,7 +32,7 @@ namespace NecroNet.UnReLoader.Commands
 
 		private void DumpProfileInfo(Profile p)
 		{
-			Out(string.Format("Profile '{0}'{1}", p.Name, string.IsNullOrEmpty(p.StartUpProject) ? null : string.Format("(startup {0})",p.StartUpProject)));
+			Out(string.Format("Profile '{0}'{1}", p.Name, string.IsNullOrEmpty(p.StartUpProject) ? null : string.Format(" (startup {0})",p.StartUpProject)));
 			p.Projects.ForEach(project => Out(string.Format(" - {0}", project)));
 		}
 	}

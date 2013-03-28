@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace NecroNet.UnReLoader.Commands
 {
-	[CommandInfo("psetstartup")]
+	[CommandMetadata("psetstartup", ShortHand = "pstart")]
 	public class SetStartupProjectForProfileCommand : CommandBase
 	{
 		public override void Execute()

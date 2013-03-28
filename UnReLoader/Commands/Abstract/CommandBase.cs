@@ -25,7 +25,7 @@ namespace NecroNet.UnReLoader.Commands
 
 		protected string GetCommandName()
 		{
-			return GetType().GetCustomAttributes(typeof (CommandInfoAttribute), false).Cast<CommandInfoAttribute>().First().Name;
+			return GetType().GetCustomAttributes(typeof (CommandMetadataAttribute), false).Cast<CommandMetadataAttribute>().First().Name;
 		}
 
 		protected void ValidateInMin(int minParameterCount)

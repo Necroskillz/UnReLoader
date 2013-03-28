@@ -4,7 +4,7 @@ using System;
 
 namespace NecroNet.UnReLoader.Commands
 {
-	[CommandInfo("premoveprojects")]
+	[CommandMetadata("premoveprojects", ShortHand = "pr")]
 	public class RemoveProjectsFromProfileCommand : CommandBase
 	{
 		public override void Execute()

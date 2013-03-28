@@ -143,6 +143,7 @@
     <Compile Include="Logic\Snapshot.cs" />
     <Compile Include="Logic\SolutionExplorerCommands.cs" />
     <Compile Include="Logic\UnReLoad.cs" />
+    <Compile Include="Logic\UnReLoadParams.cs" />
     <Compile Include="Logic\VSProject.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>

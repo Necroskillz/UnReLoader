@@ -4,7 +4,7 @@ using System;
 
 namespace NecroNet.UnReLoader.Commands
 {
-	[CommandInfo("paddprojects")]
+	[CommandMetadata("paddprojects", ShortHand = "pa")]
 	public class AddProjectsToProfileCommand : CommandBase
 	{
 		public override void Execute()

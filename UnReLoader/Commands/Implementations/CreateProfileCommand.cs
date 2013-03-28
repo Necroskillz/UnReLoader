@@ -6,7 +6,7 @@ using System.Xml.Linq;
 
 namespace NecroNet.UnReLoader.Commands
 {
-	[CommandInfo("pcreate")]
+	[CommandMetadata("pcreate", ShortHand = "pc")]
 	public class CreateProfileCommand : CommandBase
 	{
 		public override void Execute()

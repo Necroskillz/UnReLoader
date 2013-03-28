@@ -5,7 +5,7 @@ using EnvDTE;
 
 namespace NecroNet.UnReLoader.Commands
 {
-	[CommandInfo("pload", WriteDoneMessage = true)]
+	[CommandMetadata("pload", ShortHand = "pl", WriteDoneMessage = true)]
 	public class LoadProfileCommand : CommandBase
 	{
 		public override void Execute()
@@ -14,27 +14,25 @@ namespace NecroNet.UnReLoader.Commands
 
 			ValidateInMin(1);
 
-			IEnumerable<string> projects = Enumerable.Empty<string>();
-			string startUpProject = null;
-			var profileParams = Parameters.Select(p => p.ToLowerInvariant());
+			IEnumerable<string> projects;
+			string startUpProject;
 
 			if(Parameters.Count == 1)
 			{
 				var profile = ProfileManager.GetProfile(In(1), Out);
-				if(profile != null)
-				{
-					projects = profile.Projects;
-					startUpProject = profile.StartUpProject;
-				}
+				if(profile == null) return;
+			
+				projects = profile.Projects;
+				startUpProject = profile.StartUpProject;
 			}
 			else
 			{
+				var profileParams = Parameters.Select(p => p.ToLowerInvariant());
 				var profiles = ProfileManager.GetProfiles(Out).Where(p => profileParams.Contains(p.Name.ToLowerInvariant())).ToList();
-				if(profiles.Any())
-				{
-					startUpProject = profiles.First().StartUpProject;
-					projects = profiles.SelectMany(p => p.Projects).Distinct();
-				}
+				if(!profiles.Any()) return;
+			
+				startUpProject = profiles.First().StartUpProject;
+				projects = profiles.SelectMany(p => p.Projects).Distinct();
 			}
 
 			Logic.LoadProjects(projects, startUpProject, Out);

@@ -63,11 +63,14 @@ namespace NecroNet.UnReLoader
 					if(string.IsNullOrEmpty(command)) return;
 
 					WriteToConsole("> " + command);
-					CommandExecutor.Execute(command, s => Dispatcher.Invoke(new Action(() => WriteToConsole(s))));
+					CommandExecutor.Execute(command, s => Dispatcher.Invoke(new Action(() => WriteToConsole(s))), () =>
+						{
+							Logic.ReactivateConsole();
+							Dispatcher.BeginInvoke(new Action(() => PromptTextBox.Focus()));
+						});
 					CurrentCommand = CommandHistory.AddLast(command);
 					ConsoleScroll.ScrollToBottom();
 					PromptTextBox.Clear();
-					PromptTextBox.Focus();
 					break;
 				case Key.Up:
 					if(CurrentCommand == null) return;

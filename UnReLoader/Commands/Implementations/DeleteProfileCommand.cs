@@ -4,7 +4,7 @@ using System;
 
 namespace NecroNet.UnReLoader.Commands
 {
-	[CommandInfo("pdelete")]
+	[CommandMetadata("pdelete", ShortHand = "pd")]
 	public class DeleteProfileCommand : CommandBase
 	{
 		public override void Execute()

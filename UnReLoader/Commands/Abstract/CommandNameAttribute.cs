@@ -4,14 +4,15 @@ using System.Collections.Generic;
 
 namespace NecroNet.UnReLoader.Commands
 {
-	public class CommandInfoAttribute : Attribute
+	public class CommandMetadataAttribute : Attribute
 	{
-		public CommandInfoAttribute(string name)
+		public CommandMetadataAttribute(string name)
 		{
 			Name = name;
 		}
 
 		public string Name { get; set; }
+		public string ShortHand { get; set; }
 		public bool WriteDoneMessage { get; set; }
 	}
 }

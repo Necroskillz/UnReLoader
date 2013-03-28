@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace NecroNet.UnReLoader.Commands
 {
-	[CommandInfo("psnapshot")]
+	[CommandMetadata("psnapshot", ShortHand = "psnap")]
 	public class CreateSnapshotCommand : CommandBase
 	{
 		public override void Execute()
